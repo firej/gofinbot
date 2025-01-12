@@ -1,0 +1,7 @@
+# Исключить временные файлы и каталоги
+*.log
+*.db
+*.sqlite
+*.tmp
+node_modules
+vendor
