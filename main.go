@@ -20,7 +20,7 @@ func main() {
 	// updateCBR := flag.Bool("update-cbr", false, "Обновить курсы валют ЦБРФ и сохранить в базу данных")
 	flag.Parse()
 
-	db, err := sql.Open("sqlite3", "currency.db")
+	db, err := sql.Open("sqlite3", "data/currency.db")
 	if err != nil {
 		log.Fatalf("Ошибка подключения к базе данных: %s", err)
 	}
@@ -49,6 +49,7 @@ func main() {
 		log.Fatal("TELEGRAM_BOT_TOKEN не задан")
 	}
 
+	fmt.Println("token:", token)
 	// Создаем нового бота
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
@@ -164,7 +165,7 @@ func createTable(db *sql.DB) {
 		nominal INTEGER NOT NULL,
 		rate 	REAL NOT NULL,
 		date 	TEXT NOT NULL,
-		UNIQUE(char_code, date) -- Уникальный индекс по char_code и date
+		UNIQUE(code, date) -- Уникальный индекс по code и date
 	);`
 	_, err := db.Exec(query)
 	if err != nil {

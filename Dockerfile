@@ -1,8 +1,13 @@
 # 1. Используем официальный базовый образ для Go
-FROM golang:1.23 AS builder
+# FROM golang:1.23 AS builder
+FROM golang:alpine AS builder
 
 # 2. Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
+
+RUN apk update && apk upgrade
+RUN apk add --no-cache gcc musl-dev
+RUN apk add --no-cache sqlite sqlite-dev
 
 # 3. Копируем модули Go (go.mod и go.sum) и загружаем зависимости
 COPY go.mod go.sum ./
@@ -12,13 +17,15 @@ RUN go mod download
 COPY . .
 
 # 5. Сборка приложения
+ENV CGO_ENABLED=1
 RUN go build -o main .
 
 # 6. Создаем минимальный образ для выполнения
-FROM debian:bullseye-slim
+FROM alpine:latest
 
 # 7. Устанавливаем зависимости, необходимые для запуска SQLite
-RUN apt-get update && apt-get install -y ca-certificates sqlite3 && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade
+RUN apk add --no-cache sqlite
 
 # 8. Устанавливаем рабочую директорию для запуска приложения
 WORKDIR /app
